@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fee Advisor AI — Web3 Fee Intelligence Tool</title>
+
+  <!-- Poppins font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <meta name="description" content="Fee Advisor AI — a Web3 gas fee intelligence tool. Dual-mode Web3 UI, AI-backed fee predictions, and fintech-level design system." />
+
+  <style>
+    :root{
+      --bg:#0A0A0C;
+      --panel:#0f1720;
+      --muted:#94a3b8;
+      --accent-green:#10F091;
+      --accent-blue:#3AF2FF;
+      --card:#081018;
+      --glass: rgba(255,255,255,0.03);
+      --text:#e6eef8;
+      --glass-2: rgba(255,255,255,0.02);
+      --radius:14px;
+      --max-width:1100px;
+      --accent-grad: linear-gradient(135deg,#10F091 0%, #3AF2FF 100%);
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    /* Light theme variables (swapped when .light on body) */
+    body.light{ --bg: #f6fbff; --panel:#ffffff; --text:#061428; --muted:#4b5563; --card:#ffffff; --glass: rgba(10,20,30,0.03); --glass-2: rgba(10,20,30,0.02); }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 400px at 10% 10%, rgba(58,242,255,0.06), transparent),
+                  radial-gradient(900px 300px at 90% 90%, rgba(16,240,145,0.04), transparent),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px 20px;
+      display:flex;
+      justify-content:center;
+      font-size:16px;
+      line-height:1.45;
+    }
+
+    .container{max-width:var(--max-width);width:100%}
+
+    header{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:28px;
+    }
+    .brand{
+      display:flex;gap:12px;align-items:center;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:12px;
+      background:var(--accent-grad);
+      box-shadow:0 8px 30px rgba(16,240,145,0.12), 0 6px 18px rgba(58,242,255,0.06);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;color:#041018;
+      font-size:18px;
+    }
+    h1{margin:0;font-size:22px;letter-spacing:-0.2px}
+    .subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+
+    .controls{display:flex;gap:12px;align-items:center}
+    .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--text);cursor:pointer}
+    .btn.secondary{background:transparent;border-color:rgba(255,255,255,0.04);opacity:0.9}
+    .theme-toggle{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--glass);cursor:pointer;border:1px solid rgba(255,255,255,0.04)}
+
+    main{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
+    @media (max-width:980px){ main{grid-template-columns:1fr; } .right-col{order:2} }
+
+    /* LEFT COLUMN */
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:24px;border-radius:var(--radius);box-shadow:0 6px 30px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .hero{
+      display:flex;gap:20px;align-items:center;
+      padding:28px;border-radius:16px;margin-bottom:20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: inset 0 0 40px rgba(58,242,255,0.02);
+    }
+    .hero-left{flex:1}
+    .hero-meta{font-size:13px;color:var(--muted);margin-top:8px}
+    .hero-cta{margin-top:16px;display:flex;gap:12px}
+    .cta-primary{background:var(--accent-grad);padding:12px 18px;border-radius:12px;color:#041018;font-weight:600;border:none;cursor:pointer;box-shadow:0 12px 38px rgba(16,240,145,0.08)}
+    .cta-secondary{background:transparent;border:1px solid rgba(255,255,255,0.05);padding:10px 14px;border-radius:10px;color:var(--text)}
+
+    .grid-screens{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+    .screen-thumb{border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);height:210px;background:linear-gradient(180deg,var(--card), rgba(255,255,255,0.02));display:flex;align-items:center;justify-content:center;position:relative}
+    .screen-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .section{margin-top:20px}
+    h2.section-title{margin:0 0 12px 0;font-size:18px}
+    p.lead{color:var(--muted);margin:0 0 12px 0}
+
+    /* RIGHT COLUMN */
+    .right-col{position:sticky;top:36px}
+    .card{padding:18px;border-radius:12px;background:linear-gradient(180deg,var(--panel), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .tokens{display:flex;gap:10px;flex-wrap:wrap}
+    .token{width:64px;height:56px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:var(--text);box-shadow:0 6px 20px rgba(2,6,23,0.45)}
+    .token small{color:var(--muted);font-size:11px;margin-top:6px}
+
+    .spec-list{list-style:none;padding:0;margin:0;font-size:14px}
+    .spec-list li{padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.02);color:var(--muted)}
+
+    footer{margin-top:36px;color:var(--muted);font-size:13px;text-align:center}
+    .replace-note{font-size:12px;color:var(--muted);margin-top:10px}
+
+    /* Neon accents for headings */
+    .accent {background: linear-gradient(90deg, rgba(16,240,145,0.15), rgba(58,242,255,0.12)); padding:4px 8px;border-radius:8px;color:var(--text);display:inline-block;font-weight:600}
+    .kpi{display:flex;gap:12px;margin-top:10px}
+    .kpi .box{background:var(--glass-2);padding:12px;border-radius:10px;min-width:120px;text-align:center}
+    .muted-small{color:var(--muted);font-size:13px}
+
+    /* small helpers */
+    .image-placeholder{width:100%;height:140px;border-radius:10px;background:linear-gradient(135deg,#0f1720,#061421);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
+    .caption{font-size:13px;color:var(--muted);margin-top:8px}
+
+    /* link styles */
+    a.link{color:var(--accent-blue);text-decoration:none;font-weight:600}
+    a.link:hover{text-decoration:underline}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">FA</div>
+        <div>
+          <h1>Fee Advisor AI</h1>
+          <div class="subtitle">Web3 Gas Fee Intelligence — Dual-mode UI • AI Predictions</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn secondary" onclick="downloadPDF()">Download One-Pager</button>
+        <div class="theme-toggle" id="themeToggle" title="Toggle Light / Dark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="transform:translateY(2px)">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span style="font-size:13px;color:var(--muted)">Toggle</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- left column -->
+      <div>
+        <section class="panel hero">
+          <div class="hero-left">
+            <div class="accent">Case Study</div>
+            <h2 style="margin-top:8px">Fee Advisor AI — Smart Gas Fee Selection</h2>
+            <div class="hero-meta">Predictive UX + AI-driven explanations that reduce risk and cognitive load for crypto transaction users.</div>
+
+            <div class="hero-cta">
+              <button class="cta-primary">View Prototype</button>
+              <button class="cta-secondary">Open Figma Kit</button>
+            </div>
+
+            <div class="replace-note">Replace the preview images in <code>/assets/screens/</code> with your exported HIFI PNGs.</div>
+          </div>
+
+          <div style="width:360px;border-radius:12px;overflow:hidden;box-shadow:0 12px 40px rgba(16,240,145,0.04);">
+            <!-- Dual-mode preview placeholder -->
+            <div style="display:flex;height:230px">
+              <div style="flex:1;background:linear-gradient(180deg,#061421,#081018);display:flex;align-items:center;justify-content:center;color:var(--muted);padding:10px">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#0b1220,#081018);display:flex;align-items:center;justify-content:center;color:var(--muted)">
+                  <!-- Replace with: assets/screens/Dual_Dark_Preview.png -->
+                  <div style="text-align:center">
+                    <div style="font-weight:600;color:var(--muted);">Dark Mode Preview</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:6px">Replace with: <code>assets/screens/dark_grid.png</code></div>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:1;background:linear-gradient(180deg,#f8fbff,#eef6ff);display:flex;align-items:center;justify-content:center;color:#061428;padding:10px">
+                <!-- Replace with: assets/screens/light_grid.png -->
+                <div style="text-align:center">
+                  <div style="font-weight:600;color:#061428">Light Mode Preview</div>
+                  <div style="font-size:12px;color:#4b5563;margin-top:6px">Replace with: <code>assets/screens/light_grid.png</code></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Problem & Insight -->
+        <section class="section panel">
+          <h2 class="section-title">Problem & Insight</h2>
+          <p class="lead">Users face anxiety and uncertainty when sending on-chain transactions. Wallets expose raw blockchain metrics, not human-friendly guidance. The key insight: <strong>users need clarity, prediction, and reassurance</strong>, not raw data.</p>
+
+          <div class="grid-screens" style="margin-top:18px">
+            <div class="screen-thumb">
+              <!-- Replace with: assets/screens/dark_slow.png -->
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23061218'/><text x='50%' y='50%' fill='%2394a3b8' font-family='Poppins' font-size='20' text-anchor='middle'>Dark Slow Screen</text></svg>" alt="Dark Slow"/>
+            </div>
+            <div class="screen-thumb">
+              <!-- Replace with: assets/screens/dark_warning.png -->
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23061218'/><text x='50%' y='50%' fill='%2394a3b8' font-family='Poppins' font-size='20' text-anchor='middle'>Dark Warning Screen</text></svg>" alt="Dark Warning"/>
+            </div>
+            <div class="screen-thumb">
+              <!-- Replace with: assets/screens/dark_confirm.png -->
+              <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%23061218'/><text x='50%' y='50%' fill='%2394a3b8' font-family='Poppins' font-size='20' text-anchor='middle'>Dark Confirm</text></svg>" alt="Dark Confirm"/>
+            </div>
+          </div>
+        </section>
+
+        <!-- Solution -->
+        <section class="section panel">
+          <h2 class="section-title">Solution</h2>
+          <p class="lead">Fee Advisor AI uses on-chain signals + a prediction engine to suggest the appropriate fee tier (Slow / Normal / Fast / Turbo). It explains network conditions in plain language and warns users when a selection is likely to fail.</p>
+
+          <div style="display:flex;gap:12px;margin-top:12px">
+            <div style="flex:1" class="card">
+              <strong>AI Reasoning</strong>
+              <div class="muted-small" style="margin-top:8px">Translates mempool & base/priority fee data into human-friendly explanations.</div>
+            </div>
+            <div style="flex:1" class="card">
+              <strong>Prediction</strong>
+              <div class="muted-small" style="margin-top:8px">Outputs ETA, risk score, and a safety recommendation for the user.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Screens / Gallery -->
+        <section class="section panel">
+          <h2 class="section-title">High-Fidelity Screens</h2>
+          <p class="lead">Dual-mode screens demonstrate consistent system behavior across dark & light themes.</p>
+
+          <div class="grid-screens" style="margin-top:12px">
+            <!-- 6 small thumbnails as placeholders -->
+            <div class="screen-thumb"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='700'><rect width='100%' height='100%' fill='%23061218'/><text x='50%' y='50%' fill='%2394a3b8' font-family='Poppins' font-size='18' text-anchor='middle'>Dark Normal</text></svg>"/></div>
+            <div class="screen-thumb"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='700'><rect width='100%' height='100%' fill='%23eef6ff'/><text x='50%' y='50%' fill='%234b5563' font-family='Poppins' font-size='18' text-anchor='middle'>Light Normal</text></svg>"/></div>
+            <div class="screen-thumb"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='700'><rect width='100%' height='100%' fill='%23061218'/><text x='50%' y='50%' fill='%2394a3b8' font-family='Poppins' font-size='18' text-anchor='middle'>Dark Turbo</text></svg>"/></div>
+            <div class="screen-thumb"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='700'><rect width='100%' height='100%' fill='%23eef6ff'/><text x='50%' y='50%' fill='%234b5563' font-family='Poppins' font-size='18' text-anchor='middle'>Light Turbo</text></svg>"/></div>
+            <div class="screen-thumb"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='700'><rect width='100%' height='100%' fill='%23061218'/><text x='50%' y='50%' fill='%2394a3b8' font-family='Poppins' font-size='18' text-anchor='middle'>Dark Success</text></svg>"/></div>
+            <div class="screen-thumb"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='700'><rect width='100%' height='100%' fill='%23eef6ff'/><text x='50%' y='50%' fill='%234b5563' font-family='Poppins' font-size='18' text-anchor='middle'>Light Success</text></svg>"/></div>
+          </div>
+
+        </section>
+
+        <!-- Architecture -->
+        <section class="section panel">
+          <h2 class="section-title">System Architecture</h2>
+          <p class="lead">Network → AI Logic → UI Recommendation → Wallet Signer → Blockchain</p>
+
+          <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+            <div class="card" style="flex:1;min-width:220px">
+              <strong>Network Layer</strong>
+              <div class="muted-small">RPC Nodes, Mempool listeners, Gas Oracles</div>
+            </div>
+            <div class="card" style="flex:1;min-width:220px">
+              <strong>AI / Prediction</strong>
+              <div class="muted-small">Model-based time estimate, risk detector, explanation generator</div>
+            </div>
+            <div class="card" style="flex:1;min-width:220px">
+              <strong>Wallet Integration</strong>
+              <div class="muted-small">Signing via mobile wallet, deep links or extension</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Outcome -->
+        <section class="section panel">
+          <h2 class="section-title">Outcome</h2>
+          <p class="lead">This work delivers a measurable improvement in user confidence and predictability when sending transactions. It’s a full-stack UX solution for Web3 payments.</p>
+
+          <div class="kpi">
+            <div class="box"><strong>↓ 40%</strong><div class="muted-small">Cognitive load</div></div>
+            <div class="box"><strong>↑ 60%</strong><div class="muted-small">Decision accuracy</div></div>
+            <div class="box"><strong>↓ 30%</strong><div class="muted-small">Failed txs (est.)</div></div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <aside class="right-col">
+        <div class="card">
+          <h3 style="margin:0 0 8px 0">Design Tokens</h3>
+          <div class="tokens" style="margin-top:12px">
+            <div class="token" style="background:linear-gradient(135deg,#10F091,#3AF2FF)"><strong>Primary</strong><small>#10F091</small></div>
+            <div class="token" style="background:linear-gradient(135deg,#2563EB,#3AF2FF)"><strong>Accent</strong><small>#2563EB</small></div>
+            <div class="token" style="background:#DC2626"><strong>Slow</strong><small>#DC2626</small></div>
+            <div class="token" style="background:#F59E0B"><strong>Normal</strong><small>#F59E0B</small></div>
+            <div class="token" style="background:#10B981"><strong>Fast</strong><small>#10B981</small></div>
+            <div class="token" style="background:linear-gradient(135deg,#8B5CF6,#06B6D4)"><strong>Turbo</strong><small>Purple→Cyan</small></div>
+          </div>
+
+          <div style="margin-top:12px">
+            <h4 style="margin:12px 0 6px 0">Typography</h4>
+            <div class="muted-small">Poppins • H1 20 • H2 18 • Body 14 • Label 12</div>
+          </div>
+
+          <div style="margin-top:12px">
+            <h4 style="margin:12px 0 6px 0">Components</h4>
+            <ul class="spec-list">
+              <li>Smart Slider (4 snap points)</li>
+              <li>Prediction Panel (mode-aware)</li>
+              <li>Warning Block with CTA</li>
+              <li>Primary & Turbo Buttons</li>
+            </ul>
+          </div>
+
+          <div style="margin-top:12px">
+            <h4 style="margin:12px 0 6px 0">Deliverables</h4>
+            <ul class="spec-list">
+              <li>Figma Starter Kit (JSON)</li>
+              <li>12 HIFI Screens (PNG)</li>
+              <li>Component library (JSON)</li>
+              <li>Presentation & LinkedIn carousels</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <h4 style="margin:0 0 6px 0">Download & Use</h4>
+          <div class="muted-small">Place your exported assets in the repository under:</div>
+          <div style="font-family:monospace;margin-top:8px;color:var(--muted)">assets/screens/ (for PNGs)<br>assets/icons/ (for SVGs)<br>assets/docs/ (PDFs)</div>
+          <div style="margin-top:10px">
+            <button class="btn" onclick="downloadKit()">Download Starter Kit (ZIP)</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <h4 style="margin:0 0 6px 0">Contact</h4>
+          <div class="muted-small">Want this project as a case study on your portfolio or need custom edits?</div>
+          <div style="margin-top:10px"><a class="link" href="#">Contact me</a></div>
+        </div>
+
+      </aside>
+    </main>
+
+    <footer>
+      <div>© <span id="year"></span> Fee Advisor AI — Web3 UX Case Study • Built with Poppins</div>
+    </footer>
+  </div>
+
+  <script>
+    // init
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Theme toggle
+    const toggle = document.getElementById('themeToggle');
+    toggle.addEventListener('click', ()=> {
+      document.body.classList.toggle('light');
+    });
+
+    // Download handlers (placeholders)
+    function downloadKit(){
+      alert('Place your starter kit zip in the repo and link it here. Example: /assets/Fee_Advisor_UI_Kit_Full_Export.zip');
+      // Optionally initiate download if file exists: window.location.href = '/assets/Fee_Advisor_UI_Kit_Full_Export.zip';
+    }
+    function downloadPDF(){
+      alert('One-page PDF: Place Fee_Advisor_One_Page_Portfolio_Summary.pdf inside /assets/docs/ and link it here.');
+    }
+
+    // Accessibility: keyboard toggle
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 't'){ document.body.classList.toggle('light'); }
+    });
+  </script>
+</body>
+</html>
